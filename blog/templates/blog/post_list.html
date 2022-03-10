@@ -1,13 +1,18 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap">
     {% for post in posts %}
         <div class="post">
-            <div class="date">
-                {{ post.published_date }}
+            <div class="card text-dark bg-light" style="width: 24rem;">
+              <div class="card-header" >{{ post.created_date }}</div>
+              <div class="card-body">
+                <h5 class="card-title" style="height: 120px; overflow-y: hidden">{{ post.title }}</h5>
+                <p class="card-text" style="height: 300px; overflow-y: hidden">{{ post.text|linebreaksbr }}</p>
+                <a href="/post/{{ post.id }}/" class="btn btn-sm btn-info">Подробнее</a>
+              </div>
             </div>
-            <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
-            <p>{{ post.text|linebreaksbr }}</p>
         </div>
     {% endfor %}
+    </div>
 {% endblock %}
