@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Post
@@ -15,6 +16,9 @@ def post_detail(request, pk):
 
 
 def post_new(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
@@ -41,3 +45,24 @@ def post_edit(request, pk):
     else:
         form = PostForm(instance=post)
     return render(request, 'blog/post_edit.html', {'form': form})
+
+
+def login_url(request):
+    if request.method == "POST":
+        print("Our user wants to post something", request.POST)
+        username = request.POST.get("username", "")
+        password = request.POST.get("password", "")
+        user = authenticate(username=username, password=password)
+        if user is None:
+            print("Password is incorrect")
+        else:
+            print("Everything is fine")
+            login(request, user)
+            return redirect("/")
+
+    return render(request, "blog/login.html")
+
+
+def logout_url(request):
+    logout(request)
+    return redirect("/")
