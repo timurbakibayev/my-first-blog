@@ -1,17 +1,21 @@
 import pygame
 from maps import levels
 pygame.init()
-screen_size = (1200, 600)
+screen_size = (800, 300)
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption("Jungle")
 playing = True
 clock = pygame.time.Clock()
 hero_size = (screen_size[1]//80*4, screen_size[1]//80*7)
 map_height = len(levels[0])
-brick_size = (screen_size[1] // map_height, screen_size[1] // map_height)
+mrp = screen_size[1] // map_height
+brick_size = (mrp, mrp)
 
-bg_image = pygame.image.load("sprites/plx-5.png")
-bg_image = pygame.transform.scale(bg_image, screen_size)
+bg_images = list()
+for i in range(1, 6):
+    bg_image = pygame.image.load(f"sprites/plx-{i}.png")
+    bg_image = pygame.transform.scale(bg_image, screen_size)
+    bg_images.append(bg_image)
 
 hero_idle = pygame.image.load("sprites/idle.gif")
 hero_idle_right = pygame.transform.scale(hero_idle, hero_size)
@@ -39,11 +43,11 @@ ground = crop(jungle, (305, 209, 32, 32))
 ground = pygame.transform.scale(ground, brick_size)
 
 background = 0
-x = 10
-y = 10
+x = 2*mrp
+y = 5*mrp
 dx = 0
 dy = 0
-horizontal_speed = 10
+horizontal_speed = mrp//4
 look_right = True
 jumping = 1
 level = levels[0]
@@ -63,8 +67,8 @@ while playing:  # Game loop
     y += dy
 
     dy += 1
-    if dy > 10:
-        dy = 10
+    if dy > horizontal_speed:
+        dy = horizontal_speed
 
     hero_rect = pygame.Rect(x, y, hero_size[0], hero_size[1])
     for i in range(len(level)):
@@ -95,9 +99,9 @@ while playing:  # Game loop
                 look_right = True
             if event.key == pygame.K_UP:
                 if jumping < 2:
-                    dy = -14
+                    dy = -horizontal_speed*1.4
                     if jumping == 1:
-                        dy = -10
+                        dy = -horizontal_speed
                     jumping += 1
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -107,10 +111,12 @@ while playing:  # Game loop
 
     # clear screen
     screen.fill((255, 255, 255))
-    background_position = background/2 % screen_size[0]
-    screen.blit(bg_image, (background_position, 0))
-    screen.blit(bg_image, (background_position-screen_size[0], 0))
-    screen.blit(bg_image, (background_position+screen_size[0], 0))
+    for i in range(5):
+        bg_image = bg_images[i]
+        background_position = (background/(6-i)) % screen_size[0]
+        screen.blit(bg_image, (background_position, 0))
+        screen.blit(bg_image, (background_position-screen_size[0], 0))
+        screen.blit(bg_image, (background_position+screen_size[0], 0))
 
     if look_right:
         icon = hero_idle_right
