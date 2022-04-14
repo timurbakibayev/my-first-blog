@@ -1,7 +1,7 @@
 import pygame
 from maps import levels
 pygame.init()
-screen_size = (800, 300)
+screen_size = (1200, 600)
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption("Jungle")
 playing = True
@@ -29,18 +29,34 @@ hero_landing = pygame.image.load("sprites/landing.png")
 hero_landing_right = pygame.transform.scale(hero_landing, hero_size)
 hero_landing_left = pygame.transform.flip(hero_landing_right, flip_x=True, flip_y=False)
 
+hero_jumping = pygame.image.load("sprites/jump.png")
+hero_jumping_right = pygame.transform.scale(hero_jumping, hero_size)
+hero_jumping_left = pygame.transform.flip(hero_jumping_right, flip_x=True, flip_y=False)
 
-def crop(big_image, rect):
+
+def crop(big_image, rect, brick_size):
     cropped = pygame.Surface((rect[2], rect[3]))
     cropped.blit(big_image, (0, 0), rect)
-    return cropped
+    return pygame.transform.scale(cropped, brick_size)
 
 
 jungle = pygame.image.load("sprites/jungle.png")
-ground_with_gras = crop(jungle, (16, 224, 32, 32))
-ground_with_gras = pygame.transform.scale(ground_with_gras, brick_size)
-ground = crop(jungle, (305, 209, 32, 32))
-ground = pygame.transform.scale(ground, brick_size)
+
+"""
+1 - grass top
+2 - no grass
+3 - grass left and right
+4 - grass right
+5 - grass left
+"""
+grounds = [
+    None,
+    crop(jungle, (16, 224, 32, 32), brick_size),
+    crop(jungle, (305, 209, 32, 32), brick_size),
+    crop(jungle, (656, 136, 32, 32), brick_size),
+    crop(jungle, (193, 241, 32, 32), brick_size),
+    crop(jungle, (257, 241, 32, 32), brick_size)
+]
 
 background = 0
 x = 2*mrp
@@ -111,7 +127,7 @@ while playing:  # Game loop
 
     # clear screen
     screen.fill((255, 255, 255))
-    for i in range(5):
+    for i in [0, 3, 4]:
         bg_image = bg_images[i]
         background_position = (background/(6-i)) % screen_size[0]
         screen.blit(bg_image, (background_position, 0))
@@ -122,12 +138,16 @@ while playing:  # Game loop
         icon = hero_idle_right
         if dx != 0:
             icon = hero_run_right
+        if jumping > 0:
+            icon = hero_jumping_right
         if dy > 1:
             icon = hero_landing_right
     else:
         icon = hero_idle_left
         if dx != 0:
             icon = hero_run_left
+        if jumping > 0:
+            icon = hero_jumping_left
         if dy > 1:
             icon = hero_landing_left
 
@@ -136,10 +156,8 @@ while playing:  # Game loop
         for j in range(len(level[i])):
             brick_x = j*brick_size[0]
             brick_y = i*brick_size[1]
-            if level[i][j] == 1:
-                screen.blit(ground_with_gras, (brick_x + background, brick_y))
-            if level[i][j] == 2:
-                screen.blit(ground, (brick_x + background, brick_y))
+            if level[i][j] > 0:
+                screen.blit(grounds[level[i][j]], (brick_x + background, brick_y))
 
     screen.blit(icon, (x + background, y))
 

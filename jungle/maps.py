@@ -1,4 +1,11 @@
 levels = list()
+"""
+1 - grass top
+2 - no grass
+3 - grass left and right
+4 - grass right
+5 - grass left
+"""
 levels.append(
     [
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
