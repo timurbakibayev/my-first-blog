@@ -127,7 +127,7 @@ while playing:  # Game loop
 
     # clear screen
     screen.fill((255, 255, 255))
-    for i in [0, 3, 4]:
+    for i in [0, 1, 2, 3, 4]:
         bg_image = bg_images[i]
         background_position = (background/(6-i)) % screen_size[0]
         screen.blit(bg_image, (background_position, 0))
