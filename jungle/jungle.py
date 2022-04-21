@@ -17,6 +17,10 @@ for i in range(1, 6):
     bg_image = pygame.transform.scale(bg_image, screen_size)
     bg_images.append(bg_image)
 
+apple = pygame.image.load("sprites/apple.png")
+apple = pygame.transform.scale(apple, brick_size)
+
+
 hero_idle = pygame.image.load("sprites/idle.gif")
 hero_idle_right = pygame.transform.scale(hero_idle, hero_size)
 hero_idle_left = pygame.transform.flip(hero_idle_right, flip_x=True, flip_y=False)
@@ -61,12 +65,23 @@ grounds = [
 background = 0
 x = 2*mrp
 y = 5*mrp
+
 dx = 0
 dy = 0
 horizontal_speed = mrp//4
 look_right = True
 jumping = 1
-level = levels[0]
+current_level = 0
+level = levels[current_level]
+
+
+def next_level():
+    global current_level, level, levels, x, y
+    current_level = (current_level + 1) % len(levels)
+    level = levels[current_level]
+    x = 2 * mrp
+    y = 5 * mrp
+
 
 while playing:  # Game loop
     was_x = x
@@ -77,7 +92,10 @@ while playing:  # Game loop
             if level[i][j] != 0:
                 brick_rect = pygame.Rect(j*brick_size[0], i*brick_size[1], brick_size[0], brick_size[1])
                 if hero_rect.colliderect(brick_rect):
-                    x = was_x
+                    if level[i][j] != 7:
+                        x = was_x
+                    if level[i][j] == 7:
+                        next_level()
 
     was_y = y
     y += dy
@@ -92,14 +110,22 @@ while playing:  # Game loop
             if level[i][j] != 0:
                 brick_rect = pygame.Rect(j*brick_size[0], i*brick_size[1], brick_size[0], brick_size[1])
                 if hero_rect.colliderect(brick_rect):
-                    y = was_y
-                    jumping = 0
-                    dy = 0
+                    if level[i][j] != 7:
+                        y = was_y
+                        jumping = 0
+                        dy = 0
+                    if level[i][j] == 7:
+                        next_level()
+
+
+    if y > screen_size[1]:
+        x = 2 * mrp
+        y = 5 * mrp
 
     if x + background < screen_size[0]*0.1:
-        background += horizontal_speed
-    if x + background > screen_size[0]*0.8:
-        background -= horizontal_speed
+        background += (screen_size[0] * 0.1 - x - background) / 2
+    if x + background > screen_size[0]*0.7:
+        background += (screen_size[0]*0.7 - x - background)/2
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -127,7 +153,7 @@ while playing:  # Game loop
 
     # clear screen
     screen.fill((255, 255, 255))
-    for i in [0, 1, 2, 3, 4]:
+    for i in [0, 4]:
         bg_image = bg_images[i]
         background_position = (background/(6-i)) % screen_size[0]
         screen.blit(bg_image, (background_position, 0))
@@ -156,8 +182,10 @@ while playing:  # Game loop
         for j in range(len(level[i])):
             brick_x = j*brick_size[0]
             brick_y = i*brick_size[1]
-            if level[i][j] > 0:
+            if 7 > level[i][j] > 0:
                 screen.blit(grounds[level[i][j]], (brick_x + background, brick_y))
+            if level[i][j] == 7:
+                screen.blit(apple, (brick_x + background, brick_y))
 
     screen.blit(icon, (x + background, y))
 
