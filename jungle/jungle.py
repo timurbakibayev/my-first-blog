@@ -73,6 +73,7 @@ look_right = True
 jumping = 1
 current_level = 0
 level = levels[current_level]
+holding = False
 
 
 def next_level():
@@ -87,6 +88,7 @@ while playing:  # Game loop
     was_x = x
     x += dx
     hero_rect = pygame.Rect(x, y, hero_size[0], hero_size[1])
+    horizontal_collision = False
     for i in range(len(level)):
         for j in range(len(level[i])):
             if level[i][j] != 0:
@@ -94,15 +96,21 @@ while playing:  # Game loop
                 if hero_rect.colliderect(brick_rect):
                     if level[i][j] != 7:
                         x = was_x
+                        horizontal_collision = True
                     if level[i][j] == 7:
                         next_level()
 
     was_y = y
-    y += dy
+
+    if holding and horizontal_collision:
+        jumping = 0
+    else:
+        y += dy
 
     dy += 1
     if dy > horizontal_speed:
         dy = horizontal_speed
+
 
     hero_rect = pygame.Rect(x, y, hero_size[0], hero_size[1])
     for i in range(len(level)):
@@ -133,6 +141,8 @@ while playing:  # Game loop
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 playing = False
+            if event.key == pygame.K_SPACE:
+                holding = True
             if event.key == pygame.K_LEFT:
                 dx = -horizontal_speed
                 look_right = False
@@ -140,7 +150,7 @@ while playing:  # Game loop
                 dx = horizontal_speed
                 look_right = True
             if event.key == pygame.K_UP:
-                if jumping < 2:
+                if jumping < 1:
                     dy = -horizontal_speed*1.4
                     if jumping == 1:
                         dy = -horizontal_speed
@@ -150,6 +160,8 @@ while playing:  # Game loop
                 dx = 0
             if event.key == pygame.K_RIGHT:
                 dx = 0
+            if event.key == pygame.K_SPACE:
+                holding = False
 
     # clear screen
     screen.fill((255, 255, 255))
