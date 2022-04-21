@@ -25,6 +25,10 @@ hero_idle = pygame.image.load("sprites/idle.gif")
 hero_idle_right = pygame.transform.scale(hero_idle, hero_size)
 hero_idle_left = pygame.transform.flip(hero_idle_right, flip_x=True, flip_y=False)
 
+hero_holding = pygame.image.load("sprites/holding.gif")
+hero_holding_right = pygame.transform.scale(hero_holding, hero_size)
+hero_holding_left = pygame.transform.flip(hero_holding_right, flip_x=True, flip_y=False)
+
 hero_run = pygame.image.load("sprites/run.gif")
 hero_run_right = pygame.transform.scale(hero_run, hero_size)
 hero_run_left = pygame.transform.flip(hero_run_right, flip_x=True, flip_y=False)
@@ -180,6 +184,8 @@ while playing:  # Game loop
             icon = hero_jumping_right
         if dy > 1:
             icon = hero_landing_right
+        if holding and horizontal_collision:
+            icon = hero_holding_right
     else:
         icon = hero_idle_left
         if dx != 0:
@@ -188,6 +194,8 @@ while playing:  # Game loop
             icon = hero_jumping_left
         if dy > 1:
             icon = hero_landing_left
+        if holding and horizontal_collision:
+            icon = hero_holding_left
 
     # draw level
     for i in range(len(level)):
