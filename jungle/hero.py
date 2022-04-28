@@ -111,5 +111,12 @@ class Hero:
 
         if self.y > game.screen_size[1]:
             self.dead = True
+            return
 
         self.holding_wall = horizontal_collision and self.pressing_spacebar
+
+        hero_rect = pygame.Rect(self.x, self.y, game.hero_size[0], game.hero_size[1])
+        for coin_x, coin_y in game.coins:
+            coin_rect = pygame.Rect(coin_x, coin_y, game.brick_size[0], game.brick_size[1])
+            if hero_rect.colliderect(coin_rect):
+                game.eat_coin((coin_x, coin_y))

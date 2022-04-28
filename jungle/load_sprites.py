@@ -20,6 +20,7 @@ class Sprites:
     apple: Surface
     grounds: list[Surface]
     bg_images: list[Surface]
+    coin: Surface
 
 
 def crop(big_image, rect, size):
@@ -41,7 +42,9 @@ def load_sprites(
 
     apple = pygame.image.load("sprites/apple.png")
     apple = pygame.transform.scale(apple, brick_size)
-    apple = apple
+
+    coin = pygame.image.load("sprites/coin.png")
+    coin = pygame.transform.scale(coin, brick_size)
 
     hero_idle = pygame.image.load("sprites/idle.gif")
     hero_idle_right = pygame.transform.scale(hero_idle, hero_size)
@@ -95,4 +98,5 @@ def load_sprites(
         apple=apple,
         grounds=grounds,
         bg_images=bg_images,
+        coin=coin,
     )

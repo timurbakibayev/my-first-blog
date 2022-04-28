@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, List
 from load_sprites import load_sprites, Sprites
 
 import pygame
@@ -19,6 +19,7 @@ class Game:
     brick_size: Tuple[int, int]
     screen_size: Tuple[int, int]
     sprites: Sprites
+    coins: List[Tuple[int, int]]
     playing: bool = True
     current_level: int = 0
     background: int = 0
@@ -34,6 +35,9 @@ class Game:
     @property
     def level(self) -> list[list[int]]:
         return self.levels[self.current_level]
+
+    def eat_coin(self, coin: Tuple[int, int]):
+        self.coins.remove(coin)
 
     def update(self) -> None:
         self.hero.update(
@@ -52,6 +56,14 @@ class Game:
     def next_level(self):
         self.current_level = (self.current_level + 1) % len(self.levels)
         self.position_hero_start()
+
+    def update_coins(self):
+        for i in range(len(self.level)):
+            for j in range(len(self.level[i])):
+                brick_x = j * self.brick_size[0]
+                brick_y = i * self.brick_size[1]
+                if self.level[i][j] == 9:
+                    self.coins.append((brick_x, brick_y))
 
     def position_hero_start(self):
         for i in range(len(self.level)):
@@ -73,6 +85,7 @@ class Game:
             screen_size=screen_size,
             brick_size=brick_size,
             hero_size=hero_size,
+            coins=list(),
             sprites=load_sprites(
                 screen_size=screen_size,
                 hero_size=hero_size,
@@ -80,6 +93,7 @@ class Game:
             ),
         )
         game.position_hero_start()
+        game.update_coins()
         return game
 
     def draw(self, screen):
@@ -122,3 +136,5 @@ class Game:
                 if self.level[i][j] == 7:
                     screen.blit(self.sprites.apple, (brick_x + self.background, brick_y))
 
+        for x, y in self.coins:
+            screen.blit(self.sprites.coin, (x + self.background, y))
