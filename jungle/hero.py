@@ -1,8 +1,8 @@
-import random
 from dataclasses import dataclass
-from typing import Tuple, List, Callable
-
 import pygame
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game import Game
 
 
 @dataclass
@@ -16,6 +16,7 @@ class Hero:
     pressing_spacebar: bool
     holding_wall: bool
     horizontal_speed: int
+    dead: bool = False
 
     @classmethod
     def from_mrp(cls, mrp: int) -> "Hero":
@@ -57,27 +58,27 @@ class Hero:
 
     def update(
             self,
-            hero_size: Tuple[int, int],
-            level: List[List[int]],
-            brick_size: Tuple[int, int],
-            screen_size: Tuple[int, int],
-            mrp: int,
-            next_level: Callable,
+            game: "Game",
     ):
         was_x = self.x
         self.x += self.dx
-        hero_rect = pygame.Rect(self.x, self.y, hero_size[0], hero_size[1])
+        hero_rect = pygame.Rect(self.x, self.y, game.hero_size[0], game.hero_size[1])
         horizontal_collision = False
-        for i in range(len(level)):
-            for j in range(len(level[i])):
-                if level[i][j] != 0:
-                    brick_rect = pygame.Rect(j * brick_size[0], i * brick_size[1], brick_size[0], brick_size[1])
+        for i in range(len(game.level)):
+            for j in range(len(game.level[i])):
+                if game.level[i][j] != 0:
+                    brick_rect = pygame.Rect(
+                        j * game.brick_size[0],
+                        i * game.brick_size[1],
+                        game.brick_size[0],
+                        game.brick_size[1],
+                    )
                     if hero_rect.colliderect(brick_rect):
-                        if level[i][j] != 7:
+                        if game.level[i][j] < 7:
                             self.x = was_x
                             horizontal_collision = True
-                        if level[i][j] == 7:
-                            next_level()
+                        if game.level[i][j] == 7:
+                            game.next_level()
 
         was_y = self.y
 
@@ -90,21 +91,25 @@ class Hero:
         if self.dy > self.horizontal_speed:
             self.dy = self.horizontal_speed
 
-        hero_rect = pygame.Rect(self.x, self.y, hero_size[0], hero_size[1])
-        for i in range(len(level)):
-            for j in range(len(level[i])):
-                if level[i][j] != 0:
-                    brick_rect = pygame.Rect(j * brick_size[0], i * brick_size[1], brick_size[0], brick_size[1])
+        hero_rect = pygame.Rect(self.x, self.y, game.hero_size[0], game.hero_size[1])
+        for i in range(len(game.level)):
+            for j in range(len(game.level[i])):
+                if game.level[i][j] != 0:
+                    brick_rect = pygame.Rect(
+                        j * game.brick_size[0],
+                        i * game.brick_size[1],
+                        game.brick_size[0],
+                        game.brick_size[1],
+                    )
                     if hero_rect.colliderect(brick_rect):
-                        if level[i][j] != 7:
+                        if game.level[i][j] < 7:
                             self.y = was_y
                             self.jumping = 0
                             self.dy = 0
-                        if level[i][j] == 7:
-                            next_level()
+                        if game.level[i][j] == 7:
+                            game.next_level()
 
-        if self.y > screen_size[1]:
-            self.x = random.randint(2, 10) * mrp
-            self.y = 2 * mrp
+        if self.y > game.screen_size[1]:
+            self.dead = True
 
         self.holding_wall = horizontal_collision and self.pressing_spacebar
