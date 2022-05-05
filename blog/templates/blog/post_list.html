@@ -1,18 +1,29 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap">
-    {% for post in posts %}
-        <div class="post">
-            <div class="card text-dark bg-light" style="width: 24rem;">
-              <div class="card-header" >{{ post.created_date }}</div>
-              <div class="card-body">
-                <h5 class="card-title" style="height: 120px; overflow-y: hidden">{{ post.title }}</h5>
-                <p class="card-text" style="height: 300px; overflow-y: hidden">{{ post.text|linebreaksbr }}</p>
-                <a href="/post/{{ post.id }}/" class="btn btn-sm btn-info">Подробнее</a>
-              </div>
-            </div>
+    <form method="get">
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">Search</span>
+          <input type="text" class="form-control" placeholder="search..."
+                 value="{{ search }}"
+                 name="search"
+                 aria-label="Username" aria-describedby="basic-addon1">
         </div>
+    </form>
+
+
+    <table class="table table-hover">
+        <tr>
+            <th>Дата</th>
+            <th>Заголовок</th>
+            <th>Текст</th>
+        </tr>
+    {% for post in posts %}
+        <tr onclick="window.location = '/post/{{ post.id }}'" style="cursor: pointer">
+            <td>{{ post.created_date }}</td>
+            <td>{{ post.title }}</td>
+            <td>{{ post.text|linebreaksbr }}</td>
+        </tr>
     {% endfor %}
-    </div>
+    </table>
 {% endblock %}

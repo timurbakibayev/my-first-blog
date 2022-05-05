@@ -56,8 +56,10 @@ class Game:
     def next_level(self):
         self.current_level = (self.current_level + 1) % len(self.levels)
         self.position_hero_start()
+        self.update_coins()
 
     def update_coins(self):
+        self.coins = list()
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
                 brick_x = j * self.brick_size[0]
